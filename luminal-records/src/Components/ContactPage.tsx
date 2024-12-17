@@ -14,7 +14,9 @@ const ContactPage = () => {
     message: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -22,7 +24,7 @@ const ContactPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Placeholder for form submission logic
     console.log("Form submitted:", formData);
@@ -116,7 +118,7 @@ const ContactPage = () => {
                 onChange={handleChange}
                 placeholder="Your Message"
                 required
-                rows="5"
+                rows={5}
                 className="w-full bg-black border border-gray-800 rounded-lg p-3 focus:outline-none focus:border-red-500"
               />
 
