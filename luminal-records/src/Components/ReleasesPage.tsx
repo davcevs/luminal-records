@@ -1,8 +1,20 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { FaPlayCircle, FaCompactDisc, FaHeadphones } from "react-icons/fa";
+import { FaCompactDisc } from "react-icons/fa";
 
-const ReleaseCard = ({ title, artist, date, genre }) => (
+interface ReleaseCardProps {
+  title: string;
+  artist: string;
+  date: string;
+  genre: string;
+}
+
+const ReleaseCard: React.FC<ReleaseCardProps> = ({
+  title,
+  artist,
+  date,
+  genre,
+}) => (
   <motion.div
     whileHover={{ scale: 1.05 }}
     className="bg-gray-900 rounded-xl overflow-hidden shadow-lg flex transform transition-all"
@@ -10,29 +22,11 @@ const ReleaseCard = ({ title, artist, date, genre }) => (
     <div className="w-1/3 bg-red-600 flex items-center justify-center backdrop-filter backdrop-blur-md">
       <FaCompactDisc className="text-6xl text-white" />
     </div>
-    <div className="w-2/3 p-6">
-      <h3 className="text-2xl font-bold mb-2">{title}</h3>
-      <p className="text-red-400 mb-2">{artist}</p>
-      <div className="flex justify-between items-center">
-        <span className="text-gray-400">{date}</span>
-        <span className="text-purple-400">{genre}</span>
-      </div>
-      <div className="mt-4 flex space-x-4">
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-full flex items-center space-x-2 backdrop-filter backdrop-blur-md"
-        >
-          <FaPlayCircle />
-          <span>Listen</span>
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          className="bg-purple-600 text-white px-4 py-2 rounded-full flex items-center space-x-2 backdrop-filter backdrop-blur-md"
-        >
-          <FaHeadphones />
-          <span>Preview</span>
-        </motion.button>
-      </div>
+    <div className="w-2/3 p-4">
+      <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+      <p className="text-red-400">{artist}</p>
+      <p className="text-gray-400 text-sm">{genre}</p>
+      <p className="text-gray-500 text-xs mt-1">{date}</p>
     </div>
   </motion.div>
 );

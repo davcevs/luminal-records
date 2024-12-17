@@ -2,14 +2,26 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { FaMicrophone, FaMusic, FaSpotify } from "react-icons/fa";
 
-const ArtistCard = ({ name, genre, image }) => (
+interface Artist {
+  name: string;
+  genre: string;
+  image?: string;
+}
+
+interface ArtistCardProps {
+  name: string;
+  genre: string;
+  image?: string; // Optional if not always provided
+}
+
+const ArtistCard: React.FC<ArtistCardProps> = ({ name, genre, image }) => (
   <motion.div
     whileHover={{ scale: 1.05 }}
     className="bg-gray-900 rounded-xl overflow-hidden shadow-lg transform transition-all"
   >
     <div className="relative">
       <img
-        src={`/api/placeholder/400/300?text=${name}`}
+        src={image || `/api/placeholder/400/300?text=${name}`}
         alt={name}
         className="w-full h-64 object-cover"
       />
@@ -33,9 +45,8 @@ const ArtistCard = ({ name, genre, image }) => (
     </div>
   </motion.div>
 );
-
 const ArtistsPage = () => {
-  const [artists] = useState([
+  const [artists] = useState<Artist[]>([
     { name: "Neon Pulse", genre: "Electronic" },
     { name: "Crimson Wave", genre: "Alternative Rock" },
     { name: "Quantum Sync", genre: "Experimental" },

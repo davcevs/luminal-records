@@ -7,16 +7,28 @@ import {
   FaMusic,
 } from "react-icons/fa";
 
-const FeaturedArtistCard = ({ name, genre }) => (
+interface FeaturedArtistCardProps {
+  name: string;
+  genre: string;
+}
+
+import { IconType } from "react-icons";
+
+interface QuickLinkItemProps {
+  icon: IconType;
+  title: string;
+}
+
+const FeaturedArtistCard: React.FC<FeaturedArtistCardProps> = ({
+  name,
+  genre,
+}) => (
   <motion.div
     whileHover={{ scale: 1.05 }}
     className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl overflow-hidden shadow-lg transition-all"
   >
     <div className="relative">
-      <div
-        className="w-full h-48 bg-purple-500/20 
-        flex items-center justify-center"
-      >
+      <div className="w-full h-48 bg-purple-500/20 flex items-center justify-center">
         <div className="text-center p-4">
           <h3 className="text-2xl font-semibold text-white mb-2">{name}</h3>
           <p className="text-white/60 text-sm uppercase tracking-wider">
@@ -28,12 +40,11 @@ const FeaturedArtistCard = ({ name, genre }) => (
   </motion.div>
 );
 
-const QuickLinkItem = ({ icon: Icon, title }) => (
+const QuickLinkItem: React.FC<QuickLinkItemProps> = ({ icon: Icon, title }) => (
   <motion.div
     whileHover={{ scale: 1.05 }}
     className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl 
-    flex flex-col items-center justify-center p-6 text-center 
-    transition-all hover:border-red-500/50"
+    flex flex-col items-center justify-center p-6 text-center transition-all hover:border-red-500/50"
   >
     <Icon className="text-4xl text-red-500 mb-3 opacity-80" />
     <h3 className="text-white text-lg font-medium">{title}</h3>
