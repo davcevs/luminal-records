@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+footer {
+  width: 100%;
+  height: fit-content;
+  background-color: black;
+  color: white;
+  padding: 1rem;
+  margin: 0;
+}
