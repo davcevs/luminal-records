@@ -53,9 +53,9 @@ const QuickLinkItem: React.FC<QuickLinkItemProps> = ({ icon: Icon, title }) => (
 
 const MainComponent = () => {
   const featuredArtists = [
-    { name: "Neon Pulse", genre: "Electronic" },
-    { name: "Crimson Wave", genre: "Alternative Rock" },
-    { name: "Quantum Sync", genre: "Experimental" },
+    { name: "Nujee", genre: "R&B" },
+    { name: "The Game", genre: "Hip Hop" },
+    { name: "Ib Matic", genre: "Hip Hop" },
   ];
 
   const quickLinks = [
