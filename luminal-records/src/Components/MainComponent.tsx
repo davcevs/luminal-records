@@ -12,10 +12,8 @@ interface FeaturedArtistCardProps {
   genre: string;
 }
 
-import { IconType } from "react-icons";
-
 interface QuickLinkItemProps {
-  icon: IconType;
+  icon: React.ElementType;
   title: string;
 }
 
