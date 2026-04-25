@@ -1,8 +1,11 @@
 // Components/ContactPage.tsx
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useMessages } from "./MessagesContext";
 
 const ContactPage = () => {
+  const { addMessage } = useMessages();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -22,6 +25,7 @@ const ContactPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    addMessage({ ...formData, replies: [] });
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 5000);
     setFormData({

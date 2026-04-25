@@ -1,8 +1,11 @@
 // Components/DemoSubmitPage.tsx
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSubmissions } from "./SubmissionsContext";
 
 const DemoSubmitPage = () => {
+  const { addSubmission } = useSubmissions();
+
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     artistName: "",
@@ -40,13 +43,13 @@ const DemoSubmitPage = () => {
   const validateStep = () => {
     const newErrors: Record<string, string> = {};
     if (step === 1) {
-      if (!formData.artistName) newErrors.artistName = "Required";
-      if (!formData.email) newErrors.email = "Required";
+      if (!formData.artistName.trim()) newErrors.artistName = "Required";
+      if (!formData.email.trim()) newErrors.email = "Required";
       if (!formData.genre) newErrors.genre = "Required";
     }
     if (step === 2) {
-      if (!formData.demoLink) newErrors.demoLink = "Required";
-      if (!formData.bio) newErrors.bio = "Required";
+      if (!formData.demoLink.trim()) newErrors.demoLink = "Required";
+      if (!formData.bio.trim()) newErrors.bio = "Required";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -58,7 +61,10 @@ const DemoSubmitPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateStep()) setSubmitted(true);
+    if (!validateStep()) return;
+
+    addSubmission({ ...formData });
+    setSubmitted(true);
   };
 
   const genres = [
@@ -482,7 +488,7 @@ const DemoSubmitPage = () => {
                   Demo Link(s) *
                 </label>
                 <input
-                  type="url"
+                  type="text"
                   name="demoLink"
                   value={formData.demoLink}
                   onChange={handleChange}
@@ -519,6 +525,14 @@ const DemoSubmitPage = () => {
                   className={inputClass(errors.bio) + " resize-none"}
                   style={inputStyle}
                 />
+                {errors.bio && (
+                  <p
+                    className="text-red-400/70 text-[11px] mt-1"
+                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  >
+                    {errors.bio}
+                  </p>
+                )}
               </div>
 
               <div>

@@ -8,18 +8,13 @@ import {
   FaPlus,
   FaCheck,
   FaEnvelope,
+  FaChevronDown,
 } from "react-icons/fa";
+import { useSubmissions, DemoSubmission } from "./SubmissionsContext";
+import { useMessages } from "./MessagesContext";
 
-interface DemoSubmission {
-  id: string;
-  artistName: string;
-  genre: string;
-  email: string;
-  demoLink: string;
-  submittedAt: string;
-  status: "pending" | "reviewed" | "interested" | "declined";
-  city: string;
-}
+// ─── Local-only data (artists / tracks / messages don't need to be shared) ───
+
 interface Artist {
   id: string;
   name: string;
@@ -35,59 +30,17 @@ interface Track {
   uploadedAt: string;
   plays: number;
 }
-interface Message {
-  id: string;
-  name: string;
-  email: string;
-  inquiry: string;
-  subject: string;
-  message: string;
-  receivedAt: string;
-  read: boolean;
-}
+// interface Message {
+//   id: string;
+//   name: string;
+//   email: string;
+//   inquiry: string;
+//   subject: string;
+//   message: string;
+//   receivedAt: string;
+//   read: boolean;
+// }
 
-const mockSubmissions: DemoSubmission[] = [
-  {
-    id: "1",
-    artistName: "Luna Vox",
-    genre: "R&B",
-    email: "luna@email.com",
-    demoLink: "soundcloud.com/lunavox",
-    submittedAt: "2024-06-10",
-    status: "pending",
-    city: "Atlanta",
-  },
-  {
-    id: "2",
-    artistName: "Dario X",
-    genre: "Hip Hop",
-    email: "dario@email.com",
-    demoLink: "spotify.com/dariox",
-    submittedAt: "2024-06-08",
-    status: "interested",
-    city: "New York",
-  },
-  {
-    id: "3",
-    artistName: "Solar",
-    genre: "Electronic",
-    email: "solar@email.com",
-    demoLink: "youtube.com/solar",
-    submittedAt: "2024-06-05",
-    status: "reviewed",
-    city: "London",
-  },
-  {
-    id: "4",
-    artistName: "Mira Tone",
-    genre: "Indie Pop",
-    email: "mira@email.com",
-    demoLink: "soundcloud.com/miratone",
-    submittedAt: "2024-06-03",
-    status: "declined",
-    city: "Chicago",
-  },
-];
 const mockArtists: Artist[] = [
   {
     id: "1",
@@ -152,38 +105,12 @@ const mockTracks: Track[] = [
     plays: 67000,
   },
 ];
-const mockMessages: Message[] = [
-  {
-    id: "1",
-    name: "Sony Music Rep",
-    email: "rep@sony.com",
-    inquiry: "business",
-    subject: "Q3 Campaign Partnership",
-    message: "Hi, we'd like to discuss a partnership...",
-    receivedAt: "2024-06-10",
-    read: false,
-  },
-  {
-    id: "2",
-    name: "Film Sync Agency",
-    email: "sync@agency.com",
-    inquiry: "sync",
-    subject: "Netflix Show Sync Opportunity",
-    message: "We're looking for hip hop tracks...",
-    receivedAt: "2024-06-08",
-    read: true,
-  },
-  {
-    id: "3",
-    name: "Music Blog Editor",
-    email: "editor@blog.com",
-    inquiry: "press",
-    subject: "Interview Request — Nujee",
-    message: "We'd love to feature Nujee...",
-    receivedAt: "2024-06-07",
-    read: false,
-  },
-];
+
+// ─── Credentials (change these before deploying) ──────────────────────────────
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "LuminalAdmin2024";
+
+// ─── Status badge ─────────────────────────────────────────────────────────────
 
 const statusConfig = {
   pending: {
@@ -225,16 +152,19 @@ const StatusBadge = ({ status }: { status: DemoSubmission["status"] }) => {
   );
 };
 
+// ─── Login screen ─────────────────────────────────────────────────────────────
+
 const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === "luminal2024") {
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       onLogin();
     } else {
-      setError("Incorrect password");
+      setError("Invalid username or password.");
     }
   };
 
@@ -285,18 +215,42 @@ const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
                 fontFamily: "'Space Grotesk', sans-serif",
               }}
             >
+              Username
+            </label>
+            <input
+              type="text"
+              value={username}
+              autoComplete="username"
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setError("");
+              }}
+              className="w-full bg-white/5 rounded-xl px-5 py-4 text-white border border-white/10 focus:outline-none focus:border-violet-500 transition-colors"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              placeholder="Username"
+            />
+          </div>
+          <div>
+            <label
+              className="text-[10px] tracking-[0.3em] font-medium uppercase block mb-2"
+              style={{
+                color: "#8B5CF6",
+                fontFamily: "'Space Grotesk', sans-serif",
+              }}
+            >
               Password
             </label>
             <input
               type="password"
               value={password}
+              autoComplete="current-password"
               onChange={(e) => {
                 setPassword(e.target.value);
                 setError("");
               }}
               className="w-full bg-white/5 rounded-xl px-5 py-4 text-white border border-white/10 focus:outline-none focus:border-violet-500 transition-colors"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-              placeholder="Enter admin password"
+              placeholder="Password"
             />
             {error && (
               <p
@@ -309,7 +263,7 @@ const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
           </div>
           <button
             type="submit"
-            className="w-full py-4 rounded-xl text-[13px] font-bold text-white transition-all hover:scale-[1.02]"
+            className="w-full py-4 rounded-xl text-[13px] font-bold text-white transition-all hover:scale-[1.02] mt-2"
             style={{
               background: "linear-gradient(135deg, #3B82F6, #8B5CF6, #EC4899)",
               fontFamily: "'Space Grotesk', sans-serif",
@@ -318,28 +272,381 @@ const AdminLogin: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
           >
             Access Dashboard
           </button>
-          <p
-            className="text-center text-white/20 text-[11px] mt-4"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-          >
-            Demo: luminal2024
-          </p>
         </form>
       </motion.div>
     </div>
   );
 };
 
+// ─── Expandable submission detail ─────────────────────────────────────────────
+
+const SubmissionRow = ({
+  sub,
+  onStatusChange,
+}: {
+  sub: DemoSubmission;
+  onStatusChange: (id: string, status: DemoSubmission["status"]) => void;
+}) => {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div
+      className="rounded-2xl overflow-hidden"
+      style={{
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
+      {/* Summary row */}
+      <div
+        className="p-6 cursor-pointer"
+        onClick={() => setExpanded((v) => !v)}
+      >
+        <div className="flex items-start justify-between flex-wrap gap-4">
+          <div className="flex-grow">
+            <div className="flex items-center space-x-3 mb-2">
+              <h3
+                className="text-lg font-bold text-white"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                {sub.artistName}
+              </h3>
+              {sub.realName && (
+                <span
+                  className="text-white/30 text-[12px]"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                >
+                  ({sub.realName})
+                </span>
+              )}
+              <StatusBadge status={sub.status} />
+            </div>
+            <div
+              className="flex flex-wrap gap-3 text-[12px] text-white/30"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              <span>
+                {sub.genre}
+                {sub.subgenre ? ` · ${sub.subgenre}` : ""}
+              </span>
+              {sub.city && (
+                <>
+                  <span>·</span>
+                  <span>
+                    {sub.city}
+                    {sub.country ? `, ${sub.country}` : ""}
+                  </span>
+                </>
+              )}
+              <span>·</span>
+              <span>{sub.email}</span>
+              <span>·</span>
+              <span>{sub.submittedAt}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            {/* Status buttons */}
+            <div className="flex flex-wrap gap-2">
+              {(["pending", "reviewed", "interested", "declined"] as const).map(
+                (status) => (
+                  <button
+                    key={status}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onStatusChange(sub.id, status);
+                    }}
+                    className="text-[10px] font-semibold tracking-wide uppercase px-3 py-1.5 rounded-lg transition-all"
+                    style={{
+                      fontFamily: "'Space Grotesk', sans-serif",
+                      background:
+                        sub.status === status ?
+                          "rgba(139,92,246,0.2)"
+                        : "rgba(255,255,255,0.05)",
+                      color:
+                        sub.status === status ?
+                          "#A78BFA"
+                        : "rgba(255,255,255,0.3)",
+                      border:
+                        sub.status === status ?
+                          "1px solid rgba(139,92,246,0.4)"
+                        : "1px solid rgba(255,255,255,0.08)",
+                    }}
+                  >
+                    {status}
+                  </button>
+                ),
+              )}
+            </div>
+            <motion.div
+              animate={{ rotate: expanded ? 180 : 0 }}
+              className="text-white/20 ml-2 flex-shrink-0"
+            >
+              <FaChevronDown />
+            </motion.div>
+          </div>
+        </div>
+      </div>
+
+      {/* Expanded detail */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div
+              className="px-6 pb-6 grid md:grid-cols-2 gap-6"
+              style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+            >
+              {/* Left: links & social */}
+              <div className="pt-5 space-y-4">
+                {sub.demoLink && (
+                  <div>
+                    <span
+                      className="text-[10px] tracking-[0.3em] uppercase font-medium block mb-1"
+                      style={{
+                        color: "#8B5CF6",
+                        fontFamily: "'Space Grotesk', sans-serif",
+                      }}
+                    >
+                      Demo Link
+                    </span>
+                    <a
+                      href={
+                        sub.demoLink.startsWith("http") ?
+                          sub.demoLink
+                        : `https://${sub.demoLink}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 text-violet-400 hover:text-white text-[13px] font-medium transition-colors"
+                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      <FaPlay className="text-xs" />
+                      <span className="underline underline-offset-2">
+                        {sub.demoLink}
+                      </span>
+                    </a>
+                  </div>
+                )}
+
+                {(sub.socialInstagram ||
+                  sub.socialSpotify ||
+                  sub.socialYoutube) && (
+                  <div>
+                    <span
+                      className="text-[10px] tracking-[0.3em] uppercase font-medium block mb-2"
+                      style={{
+                        color: "#8B5CF6",
+                        fontFamily: "'Space Grotesk', sans-serif",
+                      }}
+                    >
+                      Socials
+                    </span>
+                    <div className="space-y-1">
+                      {sub.socialInstagram && (
+                        <p
+                          className="text-white/50 text-[12px]"
+                          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                        >
+                          Instagram: {sub.socialInstagram}
+                        </p>
+                      )}
+                      {sub.socialSpotify && (
+                        <p
+                          className="text-white/50 text-[12px]"
+                          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                        >
+                          Spotify: {sub.socialSpotify}
+                        </p>
+                      )}
+                      {sub.socialYoutube && (
+                        <p
+                          className="text-white/50 text-[12px]"
+                          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                        >
+                          YouTube: {sub.socialYoutube}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-6">
+                  {sub.phone && (
+                    <div>
+                      <span
+                        className="text-[10px] tracking-[0.3em] uppercase font-medium block mb-1"
+                        style={{
+                          color: "#8B5CF6",
+                          fontFamily: "'Space Grotesk', sans-serif",
+                        }}
+                      >
+                        Phone
+                      </span>
+                      <p
+                        className="text-white/50 text-[13px]"
+                        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                      >
+                        {sub.phone}
+                      </p>
+                    </div>
+                  )}
+                  <div>
+                    <span
+                      className="text-[10px] tracking-[0.3em] uppercase font-medium block mb-1"
+                      style={{
+                        color: "#8B5CF6",
+                        fontFamily: "'Space Grotesk', sans-serif",
+                      }}
+                    >
+                      Existing Releases
+                    </span>
+                    <p
+                      className="text-white/50 text-[13px] capitalize"
+                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      {sub.existingReleases}
+                    </p>
+                  </div>
+                  <div>
+                    <span
+                      className="text-[10px] tracking-[0.3em] uppercase font-medium block mb-1"
+                      style={{
+                        color: "#8B5CF6",
+                        fontFamily: "'Space Grotesk', sans-serif",
+                      }}
+                    >
+                      Exclusivity
+                    </span>
+                    <p
+                      className="text-white/50 text-[13px] capitalize"
+                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      {sub.exclusiveInterest}
+                    </p>
+                  </div>
+                </div>
+
+                {sub.heardAbout && (
+                  <div>
+                    <span
+                      className="text-[10px] tracking-[0.3em] uppercase font-medium block mb-1"
+                      style={{
+                        color: "#8B5CF6",
+                        fontFamily: "'Space Grotesk', sans-serif",
+                      }}
+                    >
+                      Heard About Us
+                    </span>
+                    <p
+                      className="text-white/50 text-[13px]"
+                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      {sub.heardAbout}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Right: bio, influences, message */}
+              <div className="pt-5 space-y-4">
+                {sub.bio && (
+                  <div>
+                    <span
+                      className="text-[10px] tracking-[0.3em] uppercase font-medium block mb-1"
+                      style={{
+                        color: "#8B5CF6",
+                        fontFamily: "'Space Grotesk', sans-serif",
+                      }}
+                    >
+                      Bio
+                    </span>
+                    <p
+                      className="text-white/50 text-[13px] leading-relaxed"
+                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      {sub.bio}
+                    </p>
+                  </div>
+                )}
+                {sub.influences && (
+                  <div>
+                    <span
+                      className="text-[10px] tracking-[0.3em] uppercase font-medium block mb-1"
+                      style={{
+                        color: "#8B5CF6",
+                        fontFamily: "'Space Grotesk', sans-serif",
+                      }}
+                    >
+                      Influences
+                    </span>
+                    <p
+                      className="text-white/50 text-[13px]"
+                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      {sub.influences}
+                    </p>
+                  </div>
+                )}
+                {sub.message && (
+                  <div>
+                    <span
+                      className="text-[10px] tracking-[0.3em] uppercase font-medium block mb-1"
+                      style={{
+                        color: "#8B5CF6",
+                        fontFamily: "'Space Grotesk', sans-serif",
+                      }}
+                    >
+                      Additional Message
+                    </span>
+                    <p
+                      className="text-white/50 text-[13px] leading-relaxed"
+                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      {sub.message}
+                    </p>
+                  </div>
+                )}
+
+                <a
+                  href={`mailto:${sub.email}`}
+                  className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl text-[12px] font-bold text-white transition-all hover:scale-105 mt-2"
+                  style={{
+                    background: "linear-gradient(135deg, #8B5CF6, #EC4899)",
+                    fontFamily: "'Space Grotesk', sans-serif",
+                  }}
+                >
+                  <FaEnvelope className="text-xs" />
+                  <span>Email Artist</span>
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// ─── Main AdminPanel ──────────────────────────────────────────────────────────
+
 const AdminPanel = () => {
+  const { submissions, updateStatus } = useSubmissions();
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState<
     "overview" | "demos" | "artists" | "tracks" | "messages"
   >("overview");
-  const [submissions, setSubmissions] = useState(mockSubmissions);
   const [tracks, setTracks] = useState(mockTracks);
   const [artists, setArtists] = useState(mockArtists);
-  const [messages, setMessages] = useState(mockMessages);
-  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const { messages, markRead } = useMessages();
+  const [selectedMessage, setSelectedMessage] = useState<
+    ReturnType<typeof useMessages>["messages"][0] | null
+  >(null);
   const [showAddTrack, setShowAddTrack] = useState(false);
   const [newTrack, setNewTrack] = useState({
     title: "",
@@ -350,15 +657,9 @@ const AdminPanel = () => {
 
   if (!isLoggedIn) return <AdminLogin onLogin={() => setIsLoggedIn(true)} />;
 
-  const updateSubmissionStatus = (
-    id: string,
-    status: DemoSubmission["status"],
-  ) =>
-    setSubmissions((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, status } : s)),
-    );
   const deleteTrack = (id: string) =>
     setTracks((prev) => prev.filter((t) => t.id !== id));
+
   const addTrack = () => {
     if (newTrack.title && newTrack.artist) {
       setTracks((prev) => [
@@ -374,13 +675,10 @@ const AdminPanel = () => {
       setShowAddTrack(false);
     }
   };
+
   const toggleArtistActive = (id: string) =>
     setArtists((prev) =>
       prev.map((a) => (a.id === id ? { ...a, active: !a.active } : a)),
-    );
-  const markMessageRead = (id: string) =>
-    setMessages((prev) =>
-      prev.map((m) => (m.id === id ? { ...m, read: true } : m)),
     );
 
   const tabs = [
@@ -577,7 +875,7 @@ const AdminPanel = () => {
                     Recent Submissions
                   </h3>
                   <div className="space-y-2">
-                    {submissions.slice(0, 3).map((sub) => (
+                    {submissions.slice(0, 4).map((sub) => (
                       <div
                         key={sub.id}
                         className="flex items-center justify-between p-4 rounded-xl"
@@ -601,7 +899,8 @@ const AdminPanel = () => {
                               fontFamily: "'Space Grotesk', sans-serif",
                             }}
                           >
-                            {sub.genre} · {sub.city}
+                            {sub.genre}
+                            {sub.city ? ` · ${sub.city}` : ""}
                           </p>
                         </div>
                         <StatusBadge status={sub.status} />
@@ -617,6 +916,14 @@ const AdminPanel = () => {
                   >
                     Unread Messages
                   </h3>
+                  {messages.filter((m) => !m.read).length === 0 && (
+                    <p
+                      className="text-white/20 text-[13px]"
+                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      All caught up.
+                    </p>
+                  )}
                   {messages
                     .filter((m) => !m.read)
                     .map((msg) => (
@@ -684,92 +991,27 @@ const AdminPanel = () => {
                   className="text-white/30 text-[12px]"
                   style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                 >
-                  {submissions.length} total
+                  {submissions.length} total ·{" "}
+                  {submissions.filter((s) => s.status === "pending").length}{" "}
+                  pending
                 </span>
               </div>
               <div className="space-y-3">
-                {submissions.map((sub) => (
-                  <div
-                    key={sub.id}
-                    className="rounded-2xl p-6"
-                    style={{
-                      background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(255,255,255,0.08)",
-                    }}
+                {submissions.length === 0 && (
+                  <p
+                    className="text-white/20 text-[14px] py-8 text-center"
+                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                   >
-                    <div className="flex items-start justify-between flex-wrap gap-4">
-                      <div className="flex-grow">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3
-                            className="text-lg font-bold text-white"
-                            style={{
-                              fontFamily: "'Space Grotesk', sans-serif",
-                            }}
-                          >
-                            {sub.artistName}
-                          </h3>
-                          <StatusBadge status={sub.status} />
-                        </div>
-                        <div
-                          className="flex flex-wrap gap-3 text-[12px] text-white/30 mb-3"
-                          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                        >
-                          <span>{sub.genre}</span>
-                          <span>·</span>
-                          <span>{sub.city}</span>
-                          <span>·</span>
-                          <span>{sub.email}</span>
-                          <span>·</span>
-                          <span>{sub.submittedAt}</span>
-                        </div>
-                        <a
-                          href={`https://${sub.demoLink}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center space-x-2 text-violet-400 hover:text-white text-[12px] font-medium transition-colors"
-                          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                        >
-                          <FaPlay className="text-xs" />
-                          <span>{sub.demoLink}</span>
-                        </a>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {(
-                          [
-                            "pending",
-                            "reviewed",
-                            "interested",
-                            "declined",
-                          ] as const
-                        ).map((status) => (
-                          <button
-                            key={status}
-                            onClick={() =>
-                              updateSubmissionStatus(sub.id, status)
-                            }
-                            className="text-[10px] font-semibold tracking-wide uppercase px-3 py-1.5 rounded-lg transition-all"
-                            style={{
-                              fontFamily: "'Space Grotesk', sans-serif",
-                              background:
-                                sub.status === status ?
-                                  "rgba(139,92,246,0.2)"
-                                : "rgba(255,255,255,0.05)",
-                              color:
-                                sub.status === status ?
-                                  "#A78BFA"
-                                : "rgba(255,255,255,0.3)",
-                              border:
-                                sub.status === status ?
-                                  "1px solid rgba(139,92,246,0.4)"
-                                : "1px solid rgba(255,255,255,0.08)",
-                            }}
-                          >
-                            {status}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                    No submissions yet. They'll appear here once artists submit
+                    via the demo form.
+                  </p>
+                )}
+                {submissions.map((sub) => (
+                  <SubmissionRow
+                    key={sub.id}
+                    sub={sub}
+                    onStatusChange={updateStatus}
+                  />
                 ))}
               </div>
             </motion.div>
@@ -988,7 +1230,6 @@ const AdminPanel = () => {
                 )}
               </AnimatePresence>
 
-              {/* Table */}
               <div
                 className="rounded-2xl overflow-hidden"
                 style={{ border: "1px solid rgba(255,255,255,0.08)" }}
@@ -1106,7 +1347,7 @@ const AdminPanel = () => {
                       }}
                       onClick={() => {
                         setSelectedMessage(msg);
-                        markMessageRead(msg.id);
+                        markRead(msg.id);
                       }}
                     >
                       <div className="flex items-start justify-between mb-2">
