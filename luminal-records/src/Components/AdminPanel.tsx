@@ -6,12 +6,8 @@ import {
   FaEdit,
   FaTrash,
   FaPlus,
-  FaEye,
   FaCheck,
-  FaMusic,
-  FaUsers,
   FaEnvelope,
-  FaCompactDisc,
 } from "react-icons/fa";
 
 interface DemoSubmission {
@@ -495,33 +491,33 @@ const AdminPanel = () => {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Tab Navigation */}
         <div className="flex space-x-1 mb-10 overflow-x-auto pb-1">
-          {tabs.map(({ id, label, badge }) => (
+          {tabs.map((tab) => (
             <button
-              key={id}
-              onClick={() => setActiveTab(id)}
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
               className="relative flex-shrink-0 px-5 py-2.5 rounded-xl text-[12px] font-semibold transition-all duration-200"
               style={{
                 fontFamily: "'Space Grotesk', sans-serif",
                 background:
-                  activeTab === id ?
+                  activeTab === tab.id ?
                     "linear-gradient(135deg, rgba(59,130,246,0.2), rgba(139,92,246,0.2))"
                   : "transparent",
-                color: activeTab === id ? "white" : "rgba(255,255,255,0.4)",
+                color: activeTab === tab.id ? "white" : "rgba(255,255,255,0.4)",
                 border:
-                  activeTab === id ?
+                  activeTab === tab.id ?
                     "1px solid rgba(139,92,246,0.4)"
                   : "1px solid transparent",
               }}
             >
-              {label}
-              {badge !== undefined && badge > 0 && (
+              {tab.label}
+              {"badge" in tab && tab.badge > 0 && (
                 <span
                   className="ml-2 px-1.5 py-0.5 rounded-full text-[9px] font-bold text-white"
                   style={{
                     background: "linear-gradient(135deg, #8B5CF6, #EC4899)",
                   }}
                 >
-                  {badge}
+                  {tab.badge}
                 </span>
               )}
             </button>

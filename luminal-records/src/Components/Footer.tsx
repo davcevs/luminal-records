@@ -1,5 +1,4 @@
 // Components/Footer.tsx
-import { motion } from "framer-motion";
 import { FaInstagram, FaSpotify, FaTwitter, FaYoutube } from "react-icons/fa";
 import { Link } from "react-router-dom";
 

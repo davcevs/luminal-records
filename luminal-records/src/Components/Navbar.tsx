@@ -3,12 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
-interface NavbarProps {
-  isDarkMode: boolean;
-  setIsDarkMode: (value: boolean) => void;
-}
+// interface NavbarProps {
+//   isDarkMode: boolean;
+//   setIsDarkMode: (value: boolean) => void;
+// }
 
-const Navbar = ({ isDarkMode, setIsDarkMode }: NavbarProps) => {
+const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();

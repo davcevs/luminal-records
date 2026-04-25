@@ -90,7 +90,6 @@ const DemoSubmitPage = () => {
   };
 
   const RadioGroup = ({
-    name,
     options,
     value,
     onChange,
