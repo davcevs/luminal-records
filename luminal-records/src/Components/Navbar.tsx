@@ -1,5 +1,5 @@
+// Components/Navbar.tsx
 import { Link, useLocation } from "react-router-dom";
-import { FaHome, FaMusic, FaArtstation, FaEnvelope } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
@@ -10,139 +10,201 @@ interface NavbarProps {
 
 const Navbar = ({ isDarkMode, setIsDarkMode }: NavbarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrollPosition, setScrollPosition] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
   const navItems = [
-    { icon: FaHome, label: "Home", path: "/" },
-    { icon: FaMusic, label: "Artists", path: "/artists" },
-    { icon: FaArtstation, label: "Releases", path: "/releases" },
-    { icon: FaEnvelope, label: "Contact", path: "/contact" },
+    { label: "Artists", path: "/artists" },
+    { label: "Releases", path: "/releases" },
+    { label: "Submit Demo", path: "/demo" },
+    { label: "Contact", path: "/contact" },
   ];
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollPosition(window.scrollY);
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navVariants = {
-    visible: { y: 0, opacity: 1 },
-    hidden: { y: -100, opacity: 0 },
-  };
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
 
   return (
-    <motion.nav
-      initial="visible"
-      animate={scrollPosition > 100 ? "hidden" : "visible"}
-      variants={navVariants}
-      transition={{ duration: 0.3 }}
-      className="fixed top-0 left-0 right-0 z-50 backdrop-blur-lg border-b border-white/10"
-      style={{
-        background: `rgba(0, 0, 0, ${Math.min(scrollPosition / 200, 0.9)})`,
-      }}
-    >
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-extrabold"
+    <>
+      <motion.nav
+        className="fixed top-0 left-0 right-0 z-50 transition-all duration-500"
+        style={{
+          background: scrolled ? "rgba(8,6,18,0.96)" : "transparent",
+          borderBottom:
+            scrolled ?
+              "1px solid rgba(139,92,246,0.2)"
+            : "1px solid transparent",
+          backdropFilter: scrolled ? "blur(24px)" : "none",
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          {/* Logo */}
+          <Link
+            to="/"
+            className="group flex items-center space-x-3 select-none"
           >
-            <Link
-              to="/"
-              className="hover:text-red-400 transition-all duration-300"
+            {/* Logo mark */}
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{
+                background:
+                  "linear-gradient(135deg, #3B82F6, #8B5CF6, #EC4899)",
+              }}
             >
-              Luminal<span className="text-red-500">Records</span>
-            </Link>
-          </motion.div>
-
-          <div className="hidden md:flex space-x-8 items-center">
-            {navItems.map(({ icon: Icon, label, path }) => (
-              <motion.div
-                key={path}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
+              <span
+                className="text-white font-black text-sm"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
-                <Link
-                  to={path}
-                  className={`flex items-center space-x-2 font-medium relative group ${
-                    location.pathname === path ? "text-red-400" : "text-white"
+                LR
+              </span>
+            </div>
+            <div className="flex flex-col leading-none">
+              <span
+                className="text-[10px] tracking-[0.3em] uppercase font-medium"
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  color: "#8B5CF6",
+                }}
+              >
+                Est. 2024
+              </span>
+              <span
+                className="text-[18px] font-bold tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text transition-all duration-300"
+                style={{
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  backgroundImage:
+                    "linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                LUMINAL RECORDS
+              </span>
+            </div>
+          </Link>
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navItems.map(({ label, path }) => (
+              <Link key={path} to={path} className="relative group">
+                <span
+                  className={`text-[13px] tracking-wide font-medium transition-colors duration-300 ${
+                    location.pathname === path ?
+                      "text-white"
+                    : "text-white/50 hover:text-white"
                   }`}
+                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                 >
-                  <Icon className="text-xl" />
-                  <span>{label}</span>
+                  {label}
+                </span>
+                {location.pathname === path && (
                   <motion.div
-                    className="absolute -bottom-2 left-0 right-0 h-0.5 bg-red-400 origin-left"
-                    initial={{ scaleX: 0 }}
-                    animate={{
-                      scaleX: location.pathname === path ? 1 : 0,
+                    layoutId="nav-underline"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full"
+                    style={{
+                      background: "linear-gradient(90deg, #8B5CF6, #EC4899)",
                     }}
-                    transition={{ duration: 0.3 }}
                   />
-                </Link>
-              </motion.div>
+                )}
+              </Link>
             ))}
-            <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20"
+            <Link
+              to="/admin"
+              className="text-[13px] font-medium text-white/20 hover:text-white/60 transition-colors"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
-              {isDarkMode ? "☀️" : "🌙"}
-            </button>
+              Admin
+            </Link>
           </div>
 
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            className="md:hidden text-2xl"
+          {/* Mobile Menu Toggle */}
+          <button
+            className="md:hidden flex flex-col space-y-1.5 p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? "×" : "☰"}
-          </motion.button>
+            {[0, 1, 2].map((i) => (
+              <motion.span
+                key={i}
+                animate={{
+                  rotate:
+                    i === 0 && isMenuOpen ? 45
+                    : i === 2 && isMenuOpen ? -45
+                    : 0,
+                  y:
+                    i === 0 && isMenuOpen ? 8
+                    : i === 2 && isMenuOpen ? -8
+                    : 0,
+                  opacity: i === 1 && isMenuOpen ? 0 : 1,
+                }}
+                className="block w-6 h-0.5 rounded-full bg-white origin-center"
+              />
+            ))}
+          </button>
         </div>
+      </motion.nav>
 
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="md:hidden mt-4"
-            >
-              {navItems.map(({ icon: Icon, label, path }) => (
-                <motion.div
-                  key={path}
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: -20, opacity: 0 }}
-                >
-                  <Link
-                    to={path}
-                    className={`flex items-center space-x-2 py-3 px-4 rounded-lg transition-colors ${
-                      location.pathname === path
-                        ? "bg-red-500/20 text-red-400"
-                        : "hover:bg-white/10"
-                    }`}
-                    onClick={() => setIsMenuOpen(false)}
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 flex flex-col items-center justify-center"
+            style={{
+              background: "rgba(8,6,18,0.98)",
+              backdropFilter: "blur(24px)",
+            }}
+          >
+            <div className="space-y-8 text-center">
+              {[...navItems, { label: "Admin", path: "/admin" }].map(
+                ({ label, path }, i) => (
+                  <motion.div
+                    key={path}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08 }}
                   >
-                    <Icon className="text-xl" />
-                    <span>{label}</span>
-                  </Link>
-                </motion.div>
-              ))}
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className="w-full flex items-center space-x-2 py-3 px-4 rounded-lg hover:bg-white/10"
-              >
-                <span>{isDarkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}</span>
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </motion.nav>
+                    <Link
+                      to={path}
+                      className="block text-5xl font-bold text-white hover:text-transparent transition-all duration-300"
+                      style={{
+                        fontFamily: "'Space Grotesk', sans-serif",
+                        ...(location.pathname === path ?
+                          {
+                            backgroundImage:
+                              "linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            backgroundClip: "text",
+                          }
+                        : {}),
+                      }}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {label}
+                    </Link>
+                  </motion.div>
+                ),
+              )}
+            </div>
+            <div
+              className="absolute bottom-12 text-[11px] tracking-[0.3em] text-white/20 uppercase"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              © 2024 Luminal Records
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
